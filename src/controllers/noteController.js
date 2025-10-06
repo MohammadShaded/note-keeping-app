@@ -1,4 +1,24 @@
 import Note from '../models/Note.js';
+
+
+export async function searchNotes(req, res, next) {
+  try {
+    const query = req.query.query || '';
+    const searchRegex = new RegExp(query, 'i');
+    const filter = {
+      $or: [
+        { title: searchRegex },
+        { content: searchRegex }
+      ]
+    };
+    const notes = await Note.find(filter).sort({ createdAt: -1 });
+    return res.status(200).json({ notes });
+  } catch (err) {
+    err.status = 500;
+    return next(err);
+  }
+}
+ 
 export async function deleteNote(req, res) {
   try {
     const note = await Note.findByIdAndDelete(req.params.id);
