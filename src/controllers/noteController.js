@@ -1,4 +1,18 @@
 import Note from '../models/Note.js';
+export async function deleteNote(req, res) {
+  try {
+    const note = await Note.findByIdAndDelete(req.params.id);
+    if (!note) {
+      return res.status(404).json({ error: 'Note not found' });
+    }
+    return res.status(204).send();
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid note ID' });
+    }
+    return res.status(500).json({ error: 'Server error', details: err.message });
+  }
+}
 
 export async function updateNote(req, res) {
   try {
