@@ -55,8 +55,23 @@ export async function updateNote(req, res, next) {
 
 export async function getNotes(req, res, next) {
   try {
-    const notes = await Note.find().sort({ createdAt: -1 });
-    return res.status(200).json(notes);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const total = await Note.countDocuments();
+    const notes = await Note.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    return res.status(200).json({
+      notes,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit)
+    });
   } catch (err) {
     err.status = 500;
     return next(err);
