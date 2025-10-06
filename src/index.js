@@ -12,6 +12,12 @@ app.use(noteRoutes);
 
 app.get('/', (req, res) => res.json({ status: 'ok', message: 'Note Keeping API' }));
 
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error'
+  });
+});
+
 const PORT = process.env.PORT || 3000;
 
 async function start() {
